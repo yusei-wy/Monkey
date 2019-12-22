@@ -1,6 +1,7 @@
 package lexer
 
 import (
+	"log"
 	"monkey/token"
 	"testing"
 )
@@ -17,6 +18,12 @@ let result = add(five, ten);
 
 !-/*5;
 5 < 10 > 5;
+
+if (5 < 10) {
+	return true;
+} else {
+	return false;
+}
 `
 
 	tests := []struct {
@@ -73,6 +80,24 @@ let result = add(five, ten);
 		{token.INT, "5"},
 		{token.SEMICOLON, ";"},
 
+		{token.IF, "if"},
+		{token.LPAREN, "("},
+		{token.INT, "5"},
+		{token.LT, "<"},
+		{token.INT, "10"},
+		{token.RPAREN, ")"},
+		{token.LBRACE, "{"},
+		{token.RETURN, "return"},
+		{token.TRUE, "true"},
+		{token.SEMICOLON, ";"},
+		{token.RBRACE, "}"},
+		{token.ELSE, "else"},
+		{token.LBRACE, "{"},
+		{token.RETURN, "return"},
+		{token.FALSE, "false"},
+		{token.SEMICOLON, ";"},
+		{token.RBRACE, "}"},
+
 		{token.EOF, ""},
 	}
 
@@ -80,6 +105,9 @@ let result = add(five, ten);
 
 	for i, tt := range tests {
 		tok := l.NextToken()
+
+		// TODO: lexer が完成したら消す
+		log.Printf("[%v]", tok.Literal)
 
 		if tok.Type != tt.expectedType {
 			t.Fatalf("tests[%d] - tokentype wrong. expected=%q, got=%q",
