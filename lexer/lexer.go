@@ -6,9 +6,9 @@ import (
 
 type Lexer struct {
 	input        string
-	position     int
-	readPosition int
-	ch           byte
+	position     int  // 現在の文字位置
+	readPosition int  // 次の文字位置
+	ch           byte // 検査中の文字
 }
 
 func (l *Lexer) readChar() {
@@ -29,13 +29,25 @@ func (l *Lexer) NextToken() token.Token {
 
 	switch l.ch {
 	case '=':
-		tok = newToken(token.ASSIGN, l.ch)
+		if l.peekChar() == '=' {
+			ch := l.ch
+			l.readChar()
+			tok = newTowCharToken(token.EQ, ch, l.ch)
+		} else {
+			tok = newToken(token.ASSIGN, l.ch)
+		}
+	case '!':
+		if l.peekChar() == '=' {
+			ch := l.ch
+			l.readChar()
+			tok = newTowCharToken(token.NOT_EQ, ch, l.ch)
+		} else {
+			tok = newToken(token.BANG, l.ch)
+		}
 	case '+':
 		tok = newToken(token.PLUS, l.ch)
 	case '-':
 		tok = newToken(token.MINUS, l.ch)
-	case '!':
-		tok = newToken(token.BANG, l.ch)
 	case '*':
 		tok = newToken(token.ASTERISK, l.ch)
 	case '/':
@@ -96,6 +108,13 @@ func (l *Lexer) readNumber() string {
 	return l.input[position:l.position]
 }
 
+func (l *Lexer) peekChar() byte {
+	if l.readPosition >= len(l.input) {
+		return 0
+	}
+	return l.input[l.readPosition]
+}
+
 func (l *Lexer) skipWhitespace() {
 	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
 		l.readChar()
@@ -110,6 +129,11 @@ func New(input string) *Lexer {
 
 func newToken(tokenType token.TokenType, ch byte) token.Token {
 	return token.Token{Type: tokenType, Literal: string(ch)}
+}
+
+func newTowCharToken(tokenType token.TokenType, ch1 byte, ch2 byte) token.Token {
+	literal := string(ch1) + string(ch2)
+	return token.Token{Type: tokenType, Literal: literal}
 }
 
 func isLetter(ch byte) bool {

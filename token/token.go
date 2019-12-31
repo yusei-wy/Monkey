@@ -24,6 +24,8 @@ const (
 	SLASH    = "/"
 	LT       = "<"
 	RT       = ">"
+	EQ       = "=="
+	NOT_EQ   = "!="
 
 	// delimiters
 	COMMA     = ","
@@ -47,11 +49,11 @@ const (
 var keywords = map[string]TokenType{
 	"fn":     FUNCTION,
 	"let":    LET,
+	"true":   TRUE,
+	"false":  FALSE,
 	"if":     IF,
 	"else":   ELSE,
 	"return": RETURN,
-	"true":   TRUE,
-	"false":  FALSE,
 }
 
 // 与えられた識別子から正しい TokenType を返す
