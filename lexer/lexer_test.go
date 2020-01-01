@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestNextToken(t *testing.T) {
+func Test_NextToken(t *testing.T) {
 	input := `let five = 5;
 let ten = 10;
 
