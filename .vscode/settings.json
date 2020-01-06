@@ -1,6 +1,7 @@
 {
     "cSpell.words": [
-        "GOPATH"
+        "GOPATH",
+        "integ"
     ],
     "go.inferGopath": false,
 }
