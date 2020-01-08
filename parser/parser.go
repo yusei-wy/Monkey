@@ -52,10 +52,6 @@ type (
 func New(l *lexer.Lexer) *Parser {
 	p := &Parser{l: l}
 
-	// 2つのトークンを読み込む. curToken と peekToken の両方がセットされる
-	p.nextToken()
-	p.nextToken()
-
 	p.prefixParseFns = make(map[token.TokenType]prefixParseFn)
 	p.registerPrefix(token.IDENT, p.parseIdentifier)
 	p.registerPrefix(token.INT, p.parseIntegerLiteral)
@@ -72,13 +68,24 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.EQ, p.parseInfixExpression)
 	p.registerInfix(token.NOT_EQ, p.parseInfixExpression)
 
+	// 2つのトークンを読み込む. curToken と peekToken の両方がセットされる
+	p.nextToken()
+	p.nextToken()
+
 	return p
 }
 
+func (p *Parser) nextToken() {
+	p.curToken = p.peekToken
+	p.peekToken = p.l.NextToken()
+}
+
+func (p *Parser) Errors() []string {
+	return p.errors
+}
+
 func (p *Parser) ParseProgram() *ast.Program {
-	program := &ast.Program{
-		Statements: []ast.Statement{},
-	}
+	program := &ast.Program{Statements: []ast.Statement{}}
 
 	for !p.isCurToken(token.EOF) {
 		stmt := p.parseStatement()
@@ -89,21 +96,6 @@ func (p *Parser) ParseProgram() *ast.Program {
 	}
 
 	return program
-}
-
-func (p *Parser) Errors() []string {
-	return p.errors
-}
-
-func (p *Parser) peekError(t token.TokenType) {
-	msg := fmt.Sprintf("expected next token to be %s, got %s instead",
-		t, p.peekToken.Type)
-	p.errors = append(p.errors, msg)
-}
-
-func (p *Parser) nextToken() {
-	p.curToken = p.peekToken
-	p.peekToken = p.l.NextToken()
 }
 
 func (p *Parser) parseStatement() ast.Statement {
@@ -170,10 +162,9 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 		p.noPrefixParseFnError(p.curToken.Type)
 		return nil
 	}
-
 	leftExp := prefix()
 
-	if !p.isPeekToken(token.SEMICOLON) && precedence < p.peekPrecedence() {
+	for !p.isPeekToken(token.SEMICOLON) && precedence < p.peekPrecedence() {
 		infix := p.infixParseFns[p.peekToken.Type]
 		if infix == nil {
 			return leftExp
@@ -227,8 +218,8 @@ func (p *Parser) parsePrefixExpression() ast.Expression {
 func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
 	expression := &ast.InfixExpression{
 		Token:    p.curToken,
-		Left:     left,
 		Operator: p.curToken.Literal,
+		Left:     left,
 	}
 
 	precedence := p.curPrecedence()
@@ -246,6 +237,12 @@ func (p *Parser) expectPeek(t token.TokenType) bool {
 	}
 	p.peekError(t)
 	return false
+}
+
+func (p *Parser) peekError(t token.TokenType) {
+	msg := fmt.Sprintf("expected next token to be %s, got %s instead",
+		t, p.peekToken.Type)
+	p.errors = append(p.errors, msg)
 }
 
 func (p *Parser) isCurToken(t token.TokenType) bool {
