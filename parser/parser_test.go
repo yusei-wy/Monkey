@@ -2,7 +2,6 @@ package parser
 
 import (
 	"fmt"
-	"log"
 	"testing"
 
 	"monkey/ast"
@@ -179,7 +178,6 @@ func Test_ParsingPrefixExpressions(t *testing.T) {
 		program := p.ParseProgram()
 		checkParserErrors(t, p)
 
-		log.Printf("program: %+v", program)
 		if len(program.Statements) != 1 {
 			t.Fatalf("program.Statements does not contain %d statements. got=%d",
 				1, len(program.Statements))
@@ -337,7 +335,6 @@ func Test_OperatorPrecedenceParsing(t *testing.T) {
 		l := lexer.New(tt.input)
 		p := New(l)
 		program := p.ParseProgram()
-		log.Println(program)
 		checkParserErrors(t, p)
 
 		actual := program.String()
