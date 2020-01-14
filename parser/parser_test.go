@@ -339,6 +339,79 @@ func Test_ParsingPrefixExpressions(t *testing.T) {
 	}
 }
 
+func Test_FunctionLiteralParsing(t *testing.T) {
+	input := `fn(x, y) { x + y; }`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program.Statements does not contain 1 statements. got=%d", len(program.Statements))
+	}
+
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T",
+			program.Statements[0])
+	}
+
+	fn, ok := stmt.Expression.(*ast.FunctionLiteral)
+	if !ok {
+		t.Fatalf("stmt.Expression is not ast.FunctionLiteral. got=%T", stmt.Expression)
+	}
+
+	if len(fn.Paramters) != 2 {
+		t.Fatalf("fn.Paramters does not contain 2 paramters. got=%d", len(fn.Paramters))
+	}
+
+	testLiteralExpression(t, fn.Paramters[0], "x")
+	testLiteralExpression(t, fn.Paramters[1], "y")
+
+	if len(fn.Body.Statements) != 1 {
+		t.Fatalf("fn.Body.Statements has not 1 statements. got=%d", len(fn.Body.Statements))
+	}
+
+	bodyStmt, ok := fn.Body.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("fn.Body.Statements[0] is not ast.ExpressionStatement. got=%T",
+			fn.Body.Statements[0])
+	}
+
+	testInfixExpression(t, bodyStmt.Expression, "x", "+", "y")
+}
+
+func Test_FunctionParameterParsing(t *testing.T) {
+	tests := []struct {
+		input             string
+		expectedParamters []string
+	}{
+		{input: "fn() {}", expectedParamters: []string{}},
+		{input: "fn(x) {}", expectedParamters: []string{"x"}},
+		{input: "fn(x, y, z) {}", expectedParamters: []string{"x", "y", "z"}},
+	}
+
+	for _, tt := range tests {
+		l := lexer.New(tt.input)
+		p := New(l)
+		program := p.ParseProgram()
+		checkParserErrors(t, p)
+
+		stmt := program.Statements[0].(*ast.ExpressionStatement)
+		fn := stmt.Expression.(*ast.FunctionLiteral)
+
+		if len(fn.Paramters) != len(tt.expectedParamters) {
+			t.Errorf("length paramters wrong. want %d, got=%d",
+				len(tt.expectedParamters), len(fn.Paramters))
+		}
+
+		for i, ident := range tt.expectedParamters {
+			testLiteralExpression(t, fn.Paramters[i], ident)
+		}
+	}
+}
+
 func Test_ParsingInfixExpressions(t *testing.T) {
 	infixTests := []struct {
 		input      string
