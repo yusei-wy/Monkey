@@ -18,3 +18,4 @@ jobs:
       - run: go test -v ./ast
       - run: go test -v ./lexer
       - run: go test -v ./parser
+      - run: go test -v ./evaluator

@@ -5,3 +5,4 @@ test:
 	go test -v ./ast
 	go test -v ./lexer
 	go test -v ./parser
+	go test -v ./evaluator
