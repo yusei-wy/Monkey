@@ -2,6 +2,7 @@ package evaluator
 
 import (
 	"fmt"
+
 	"monkey/ast"
 	"monkey/object"
 )
@@ -19,8 +20,17 @@ func Eval(node ast.Node) object.Object {
 	// Statement
 	case *ast.Program:
 		return evalProgram(node)
+	case *ast.BlockStatement:
+		return evalBlockStatement(node)
 	case *ast.ExpressionStatement:
 		return Eval(node.Expression)
+	case *ast.ReturnStatement:
+		val := Eval(node.ReturnValue)
+		if isError(val) {
+			return val
+		}
+		return &object.ReturnValue{Value: val}
+
 	// Expression
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: node.Value}
@@ -44,16 +54,8 @@ func Eval(node ast.Node) object.Object {
 		}
 
 		return evalInfixExpression(node.Operator, left, right)
-	case *ast.BlockStatement:
-		return evalBlockStatement(node)
 	case *ast.IfExpression:
 		return evalIfExpression(node)
-	case *ast.ReturnStatement:
-		val := Eval(node.ReturnValue)
-		if isError(val) {
-			return val
-		}
-		return &object.ReturnValue{Value: val}
 	}
 
 	return nil
@@ -104,13 +106,13 @@ func evalPrefixExpression(operator string, right object.Object) object.Object {
 	}
 }
 
-func evalInfixExpression(operator string, left object.Object, right object.Object) object.Object {
+func evalInfixExpression(operator string, left, right object.Object) object.Object {
 	switch {
 	case left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ:
 		return evalIntegerInfixExpression(operator, left, right)
 	case operator == "==":
 		return nativeBoolToBooleanObject(left == right)
-	case operator != "":
+	case operator == "!=":
 		return nativeBoolToBooleanObject(left != right)
 	case left.Type() != right.Type():
 		return newError("type mismatch: %s %s %s", left.Type(), operator, right.Type())
@@ -119,7 +121,7 @@ func evalInfixExpression(operator string, left object.Object, right object.Objec
 	}
 }
 
-func evalIntegerInfixExpression(operator string, left object.Object, right object.Object) object.Object {
+func evalIntegerInfixExpression(operator string, left, right object.Object) object.Object {
 	leftVal := left.(*object.Integer).Value
 	rightVal := right.(*object.Integer).Value
 
