@@ -160,6 +160,33 @@ func Test_IntegerLiteralExpression(t *testing.T) {
 	}
 }
 
+func Test_StringLiteralExpression(t *testing.T) {
+	input := `"hello world"`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program has not enough statements. got=%d", len(program.Statements))
+	}
+
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T",
+			program.Statements[0])
+	}
+
+	literal, ok := stmt.Expression.(*ast.StringLiteral)
+	if !ok {
+		t.Fatalf("exp not *ast.IntergerLiteral. got=%T", stmt.Expression)
+	}
+	if literal.Value != "hello world" {
+		t.Fatalf("literal.Value not %q. got=%q", "hello world", literal.Value)
+	}
+}
+
 func Test_BooleanExpression(t *testing.T) {
 	tests := []struct {
 		input           string
