@@ -15,6 +15,7 @@ const (
 	ERROR_OBJ = "ERROR"
 
 	INTEGER_OBJ  = "INTEGER"
+	STRING_OBJ   = "STRING"
 	BOOLEAN_OBJ  = "BOOLEAN"
 	FUNCTION_OBJ = "FUNCTION"
 
@@ -44,6 +45,13 @@ type Integer struct {
 
 func (i *Integer) Type() ObjectType { return INTEGER_OBJ }
 func (i *Integer) Inspect() string  { return fmt.Sprintf("%d", i.Value) }
+
+type String struct {
+	Value string
+}
+
+func (i *String) Type() ObjectType { return INTEGER_OBJ }
+func (i *String) Inspect() string  { return fmt.Sprintf("%s", i.Value) }
 
 type Boolean struct {
 	Value bool
