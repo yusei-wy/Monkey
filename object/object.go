@@ -50,7 +50,7 @@ type String struct {
 	Value string
 }
 
-func (i *String) Type() ObjectType { return INTEGER_OBJ }
+func (i *String) Type() ObjectType { return STRING_OBJ }
 func (i *String) Inspect() string  { return fmt.Sprintf("%s", i.Value) }
 
 type Boolean struct {
