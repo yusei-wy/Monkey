@@ -5,5 +5,5 @@
         "integ",
         "stmts"
     ],
-    "go.inferGopath": false,
+    "go.inferGopath": false
 }

@@ -8,18 +8,22 @@ import (
 	"monkey/ast"
 )
 
+type BuiltinFunction func(args ...Object) Object
+
 type ObjectType string
 
 const (
 	NULL_OBJ  = "NULL"
 	ERROR_OBJ = "ERROR"
 
-	INTEGER_OBJ  = "INTEGER"
-	STRING_OBJ   = "STRING"
-	BOOLEAN_OBJ  = "BOOLEAN"
-	FUNCTION_OBJ = "FUNCTION"
+	INTEGER_OBJ = "INTEGER"
+	STRING_OBJ  = "STRING"
+	BOOLEAN_OBJ = "BOOLEAN"
 
 	RETURN_VALUE_OBJ = "RETURN_VALUE"
+
+	FUNCTION_OBJ = "FUNCTION"
+	BUILTIN_OBJ  = "BUILTIN"
 )
 
 type Object interface {
@@ -91,3 +95,10 @@ func (f *Function) Inspect() string {
 
 	return out.String()
 }
+
+type Builtin struct {
+	Fn BuiltinFunction
+}
+
+func (b *Builtin) Type() ObjectType { return BUILTIN_OBJ }
+func (b *Builtin) Inspect() string  { return "builtin function" }
