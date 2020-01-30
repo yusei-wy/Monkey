@@ -117,11 +117,11 @@ if (5 < 10) {
 		{token.STRING, "foobar"},
 		{token.STRING, "foo bar"},
 
-		{token.LBRACE, "["},
+		{token.LBRACKET, "["},
 		{token.INT, "1"},
 		{token.COMMA, ","},
 		{token.INT, "2"},
-		{token.RBRACE, "]"},
+		{token.RBRACKET, "]"},
 		{token.SEMICOLON, ";"},
 
 		{token.EOF, ""},
