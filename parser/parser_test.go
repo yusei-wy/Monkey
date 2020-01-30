@@ -222,6 +222,33 @@ func Test_BooleanExpression(t *testing.T) {
 	}
 }
 
+func Test_ParsingArrayLiterals(t *testing.T) {
+	input := "[1, 2 * 2, 3 + 3]"
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T", program.Statements[0])
+	}
+
+	arr, ok := stmt.Expression.(*ast.ArrayLiteral)
+	if !ok {
+		t.Fatalf("exp not ast.ArrayLiteral. got=%T", stmt.Expression)
+	}
+
+	if len(arr.Elements) != 3 {
+		t.Fatalf("len(arr.Elements) not 3. got=%d", len(arr.Elements))
+	}
+
+	testIntegerLiteral(t, arr.Elements[0], 1)
+	testInfixExpression(t, arr.Elements[1], 2, "*", 2)
+	testInfixExpression(t, arr.Elements[2], 3, "+", 3)
+}
+
 func Test_IfExpression(t *testing.T) {
 	input := `if (x < y) { x }`
 
