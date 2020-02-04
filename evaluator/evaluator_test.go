@@ -319,10 +319,21 @@ func Test_BuiltinFunctions(t *testing.T) {
 		{`len("one", "two")`, "wrong number of arguments. got=2, want=1"},
 		{`len([1, 2, 3])`, 3},
 		{`len([1, 2 * 2, 3 + 3])`, 3},
+		{`len([])`, 0},
 		{`first([1, 2, 3])`, 1},
 		{`first([1 * 10, 2, 3])`, 10},
+		{`first([])`, nil},
+		{`first(1)`, "argument to `first` must be ARRAY, got INTEGER"},
 		{`last([1, 2, 3])`, 3},
 		{`last([1, 2, 3 + 3])`, 6},
+		{`last([])`, nil},
+		{`last(1)`, "argument to `last` must be ARRAY, got INTEGER"},
+		{`rest([1, 2, 3, 4])`, []int{2, 3, 4}},
+		{`rest([2, 3, 4])`, []int{3, 4}},
+		{`rest([1])`, []int{}},
+		{`rest([])`, nil},
+		{`push([], 1)`, []int{1}},
+		{`push(1, 1)`, "argument to `push` must be ARRAY, got INTEGER"},
 	}
 
 	for _, tt := range tests {
