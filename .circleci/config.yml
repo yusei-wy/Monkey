@@ -15,7 +15,8 @@ jobs:
       - checkout
 
       # specify any bash command here prefixed with `run: `
-      - run: go test -v ./ast
       - run: go test -v ./lexer
+      - run: go test -v ./ast
       - run: go test -v ./parser
+      - run: go test -v ./object
       - run: go test -v ./evaluator
