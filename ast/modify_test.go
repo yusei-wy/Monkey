@@ -95,6 +95,24 @@ func Test_Modify(t *testing.T) {
 			&LetStatement{Value: one()},
 			&LetStatement{Value: two()},
 		},
+		{
+			&FunctionLiteral{
+				Paramters: []*Identifier{},
+				Body: &BlockStatement{
+					Statements: []Statement{
+						&ExpressionStatement{Expression: one()},
+					},
+				},
+			},
+			&FunctionLiteral{
+				Paramters: []*Identifier{},
+				Body: &BlockStatement{
+					Statements: []Statement{
+						&ExpressionStatement{Expression: two()},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range tests {
