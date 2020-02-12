@@ -87,6 +87,10 @@ func Test_Modify(t *testing.T) {
 				},
 			},
 		},
+		{
+			&ReturnStatement{ReturnValue: one()},
+			&ReturnStatement{ReturnValue: two()},
+		},
 	}
 
 	for _, tt := range tests {
