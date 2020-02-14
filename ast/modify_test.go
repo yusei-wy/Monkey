@@ -97,7 +97,7 @@ func Test_Modify(t *testing.T) {
 		},
 		{
 			&FunctionLiteral{
-				Paramters: []*Identifier{},
+				Parameters: []*Identifier{},
 				Body: &BlockStatement{
 					Statements: []Statement{
 						&ExpressionStatement{Expression: one()},
@@ -105,7 +105,7 @@ func Test_Modify(t *testing.T) {
 				},
 			},
 			&FunctionLiteral{
-				Paramters: []*Identifier{},
+				Parameters: []*Identifier{},
 				Body: &BlockStatement{
 					Statements: []Statement{
 						&ExpressionStatement{Expression: two()},

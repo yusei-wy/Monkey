@@ -442,12 +442,12 @@ func Test_FunctionLiteralParsing(t *testing.T) {
 		t.Fatalf("stmt.Expression is not ast.FunctionLiteral. got=%T", stmt.Expression)
 	}
 
-	if len(fn.Paramters) != 2 {
-		t.Fatalf("fn.Paramters does not contain 2 paramters. got=%d", len(fn.Paramters))
+	if len(fn.Parameters) != 2 {
+		t.Fatalf("fn.Parameters does not contain 2 paramters. got=%d", len(fn.Parameters))
 	}
 
-	testLiteralExpression(t, fn.Paramters[0], "x")
-	testLiteralExpression(t, fn.Paramters[1], "y")
+	testLiteralExpression(t, fn.Parameters[0], "x")
+	testLiteralExpression(t, fn.Parameters[1], "y")
 
 	if len(fn.Body.Statements) != 1 {
 		t.Fatalf("fn.Body.Statements has not 1 statements. got=%d", len(fn.Body.Statements))
@@ -464,12 +464,12 @@ func Test_FunctionLiteralParsing(t *testing.T) {
 
 func Test_FunctionParameterParsing(t *testing.T) {
 	tests := []struct {
-		input             string
-		expectedParamters []string
+		input              string
+		expectedParameters []string
 	}{
-		{input: "fn() {}", expectedParamters: []string{}},
-		{input: "fn(x) {}", expectedParamters: []string{"x"}},
-		{input: "fn(x, y, z) {}", expectedParamters: []string{"x", "y", "z"}},
+		{input: "fn() {}", expectedParameters: []string{}},
+		{input: "fn(x) {}", expectedParameters: []string{"x"}},
+		{input: "fn(x, y, z) {}", expectedParameters: []string{"x", "y", "z"}},
 	}
 
 	for _, tt := range tests {
@@ -481,13 +481,13 @@ func Test_FunctionParameterParsing(t *testing.T) {
 		stmt := program.Statements[0].(*ast.ExpressionStatement)
 		fn := stmt.Expression.(*ast.FunctionLiteral)
 
-		if len(fn.Paramters) != len(tt.expectedParamters) {
+		if len(fn.Parameters) != len(tt.expectedParameters) {
 			t.Errorf("length paramters wrong. want %d, got=%d",
-				len(tt.expectedParamters), len(fn.Paramters))
+				len(tt.expectedParameters), len(fn.Parameters))
 		}
 
-		for i, ident := range tt.expectedParamters {
-			testLiteralExpression(t, fn.Paramters[i], ident)
+		for i, ident := range tt.expectedParameters {
+			testLiteralExpression(t, fn.Parameters[i], ident)
 		}
 	}
 }
@@ -807,6 +807,44 @@ func Test_ParsingHashLiteralsWithExpressions(t *testing.T) {
 
 		testFunc(value)
 	}
+}
+
+func Test_MacroLiteralParsing(t *testing.T) {
+	input := `macro(x, y) { x + y; }`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not *ast.ExpressionStatement. got=%T", program.Statements[0])
+	}
+
+	macro, ok := stmt.Expression.(*ast.MacroLiteral)
+	if !ok {
+		t.Fatalf("exp is not *ast.MacroLiteral. got=%T", stmt.Expression)
+	}
+
+	if len(macro.Parameters) != 2 {
+		t.Fatalf("macro literal paramters wrong. want 2, got=%d", len(macro.Parameters))
+	}
+
+	testLiteralExpression(t, macro.Parameters[0], "x")
+	testLiteralExpression(t, macro.Parameters[1], "y")
+
+	if len(macro.Body.Statements) != 1 {
+		t.Fatalf("macro.Body.Statements wrong. want 1, got=%d", len(macro.Body.Statements))
+	}
+
+	bodyStmt, ok := macro.Body.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("macro.Body.Statements[0] is not *ast.ExpressionStatement. got=%T",
+			macro.Body.Statements[0])
+	}
+
+	testInfixExpression(t, bodyStmt.Expression, "x", "+", "y")
 }
 
 func testInfixExpression(
