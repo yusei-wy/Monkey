@@ -41,6 +41,8 @@ func isUnquoteCall(node ast.Node) bool {
 	return callExpression.Function.TokenLiteral() == "unquote"
 }
 
+// 注意：新しい token を作って Node を返しているが親 Node の Token フィールドは更新していない
+// 結果辻褄の合わない AST ができたり、バグに繋がったりする可能性もある
 func convertObjectToAsTNode(obj object.Object) ast.Node {
 	switch obj := obj.(type) {
 	case *object.Integer:
